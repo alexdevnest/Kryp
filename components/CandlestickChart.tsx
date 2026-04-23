@@ -1,10 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import { CandlestickSeries, createChart, IChartApi, ISeriesApi } from "lightweight-charts";
 import { getCandlestickConfig, getChartConfig, PERIOD_BUTTONS, PERIOD_CONFIG } from "@/constants";
-import { fetcher } from "@/lib/coingecko.actions";
+import { getOHLCData } from "@/lib/coingecko.actions";
 import { convertOHLCData } from "@/lib/utils";
 
 
@@ -15,7 +14,6 @@ export default function CandlestickChart ({
   height = 360,
   initialPeriod = 'daily'
 }: CandlestickChartProps) {
-  const [ loading, setLoading ] = useState(false);
   const [ period, setPeriod ] = useState(initialPeriod);
   const [ ohlcData, setOhlcData ] = useState<OHLCData[]>(data ?? []);
 
@@ -30,13 +28,17 @@ export default function CandlestickChart ({
     try {
       const { days } = PERIOD_CONFIG[selectedPeriod];
 
-      const newData = await fetcher<OHLCData[]>(`/coins/${coinId}/ohlc`, {
-        vs_currency: 'usd',
-        days,
-        precision: 'full',
-      })
+      const newData = await getOHLCData(coinId, days);
 
-      setOhlcData(newData ?? []);
+      const normalizedData = (newData ?? []).map((item) => [
+        Math.floor(item[0] / 1000),
+        item[1],
+        item[2],
+        item[3],
+        item[4]
+      ] as OHLCData);
+
+      setOhlcData(normalizedData);
     }
     catch (e) {
       console.error('Error fetching OHLC data:', e);
@@ -87,24 +89,6 @@ export default function CandlestickChart ({
     }
   }, [ height, period, ohlcData ])
 
-  useEffect(() => {
-    if (!candleSeriesRef.current) return;
-
-    const convertedToSeconds = ohlcData.map(
-      (item) => [
-        Math.floor(item[0] / 1000),
-        item[1],
-        item[2],
-        item[3],
-        item[4]
-      ] as OHLCData,
-    )
-
-    const converted = convertOHLCData(convertedToSeconds);
-    candleSeriesRef.current.setData(converted);
-    chartRef.current?.timeScale().fitContent();
-
-  }, [ohlcData, period]);
 
   return (
     <div id="candlestick-chart">
@@ -131,7 +115,7 @@ export default function CandlestickChart ({
                   onClick={
                     () => handlePeriodChange(value)
                   }
-                  disabled={loading}
+                  disabled={isPending}
                 >
                   { label }
                 </button>
