@@ -61,13 +61,16 @@ const columns: DataTableColumn<TrendingCoin>[] =[
 
 export default async function TrendingCoins () {
   const trendingCoins = await fetcher<{ coins: TrendingCoin[] }> ('/search/trending', undefined, 300)
+  const coins = Array.isArray(trendingCoins?.coins)
+    ? trendingCoins.coins.slice(0, 6)
+    : []
 
   return (
     <div id="trending-coins">
       <h4>Trending Coins</h4>
         <DataTable
           columns={columns}
-          data={ trendingCoins.coins.slice(0, 6) || [] }
+          data={ coins }
           rowKey={ (coin) => coin.item.id }
           tableClassName="trending-coins-table"
           headerCellClassName="py-3!"

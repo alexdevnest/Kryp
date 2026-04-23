@@ -4,7 +4,7 @@ import { CoinOverviewFallback, TrendingCoinsFallback } from "@/components/home/f
 import { Suspense } from "react";
 
 
-export default async function Page () {
+export default function Page () {
   return (
     <main className="main-container">
       <section className="home-grid">

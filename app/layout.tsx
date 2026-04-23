@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Kryp",
-  description: "A real-time crypto analtics terminal with global market data, news, and social media sentiment analysis.",
+  description: "A real-time crypto analytics terminal with global market data, news, and social media sentiment analysis.",
 };
 
 

@@ -26,16 +26,16 @@ export async function fetcher<T> (
       "Content-Type": "application/json",
     } as Record<string, string>,
     next: { revalidate }
-  })
+  });
 
   if (!response.ok) {
-    const errorBody: CoinGeckoErrorBody = await response.json()
+    const errorBody: CoinGeckoErrorBody | undefined = await response.json()
       .catch(
-        () => {}
+        () => undefined
       )
     
     throw new Error(`
-      API Error: ${response.status}: ${ errorBody.error || response.statusText }
+      API Error: ${response.status}: ${ errorBody?.error || response.statusText }
     `)
   }
 
