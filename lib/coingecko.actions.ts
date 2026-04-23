@@ -47,7 +47,7 @@ export async function getOHLCData (
   coinId: string,
   days: number | string,
 ): Promise<OHLCData[]> {
-  return fetcher<OHLCData[]>(`/coins/${coinId}/ohlc`, {
+  return fetcher<OHLCData[]>(`coins/${coinId}/ohlc`, {
     vs_currency: 'usd',
     days,
     precision: 'full',
