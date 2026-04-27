@@ -87,9 +87,7 @@ export default async function Coins ({ searchParams }: NextPageProps) {
   ];
 
   const hasMorePages = coinsData.length === perPage;
-  const estimatedTotalPages = currentPage >= 100
-    ? Math.ceil(currentPage / 100) * 100 + 100
-    : 100;
+  const estimatedTotalPages = hasMorePages ? currentPage + 1 : currentPage;
   
 
   return (
