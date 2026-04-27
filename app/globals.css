@@ -322,23 +322,23 @@
       @apply bg-dark-500 overflow-hidden;
 
       .name-cell {
-        @apply font-bold;
+        @apply font-bold max-w-xs;
 
         a {
-          @apply pl-1 md:pl-2 py-1 md:py-2 xl:py-1 flex items-center gap-2 md:gap-3;
+          @apply pl-1 md:pl-2 py-1 md:py-2 xl:py-1 flex items-center gap-1 md:gap-3 truncate;
 
           img {
-            @apply rounded-full size-8 md:size-9;
+            @apply rounded-full size-8 md:size-9 shrink-0;
           }
 
           p {
-            @apply text-sm md:text-base;
+            @apply text-sm md:text-base truncate;
           }
         }
       }
 
       .change-cell {
-        @apply font-medium py-4 pr-3 md:pr-5;
+        @apply font-medium py-4 pr-1 md:pr-3;
       }
 
       .price-cell {

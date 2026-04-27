@@ -73,3 +73,59 @@ export function TrendingCoinsFallback() {
     </div>
   );
 }
+
+
+export function CategoriesFallback() {
+  const skeletonColumns: DataTableColumn<Record<string, unknown>>[] = [
+    {
+      header: "Category",
+      cellClassName: "category-cell",
+      cell: () => <div className="skeleton category-skeleton" />,
+    },
+    {
+      header: "Top Gainers",
+      cellClassName: "top-gainers-cell",
+      cell: () => (
+        <div className="flex gap-1">
+          <div className="skeleton coin-skeleton" />
+          <div className="skeleton coin-skeleton" />
+          <div className="skeleton coin-skeleton" />
+        </div>
+      ),
+    },
+    {
+      header: "Market Cap",
+      cellClassName: "market-cap-cell",
+      cell: () => <div className="skeleton value-skeleton-lg" />,
+    },
+    {
+      header: "24h Change",
+      cellClassName: "change-header-cell",
+      cell: () => (
+        <div className="change-cell">
+          <div className="skeleton change-icon" />
+          <div className="skeleton value-skeleton-md" />
+        </div>
+      ),
+    },
+    {
+      header: "24h Volume",
+      cellClassName: "volume-cell",
+      cell: () => <div className="skeleton value-skeleton-lg" />,
+    },
+  ];
+
+  const skeletonData = Array.from({ length: 10 }, () => ({}));
+
+  return (
+    <div id="categories-fallback">
+      <h4>Top Categories</h4>
+      <DataTable
+        columns={skeletonColumns}
+        data={skeletonData}
+        rowKey={(_, index) => `skeleton-${index}`}
+        tableClassName="mt-3"
+      />
+    </div>
+  );
+}
