@@ -1,0 +1,112 @@
+import Link from "next/link";
+import Image from "next/image";
+import { fetcher } from "@/lib/coingecko.actions";
+import { cn, formatPercentage, formatCurrency } from "@/lib/utils";
+import DataTable from "@/components/DataTable";
+import CoinsPagination from "@/components/CoinsPagination";
+
+
+export default async function Coins ({ searchParams }: NextPageProps) {
+  const { page } = await searchParams;
+
+  const parsedPage = Number.parseInt(String(page ?? "1"), 10);
+  const currentPage = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
+  const perPage = 10;
+
+  const coinsData = await fetcher<CoinMarketData[]>("coins/markets", {
+    vs_currency: "usd",
+    order: "market_cap_desc",
+    per_page: perPage,
+    page: currentPage,
+    sparkline: "false",
+    price_change_percentage: "24h",
+  });
+
+  const columns: DataTableColumn<CoinMarketData>[] = [
+    {
+      header: "Rank",
+      cellClassName: "rank-cell",
+      cell: (coin) => (
+        <>
+          #{ coin.market_cap_rank }
+          <Link 
+            href={`/coins/${coin.id}`}
+            aria-label={`View ${coin.name} details`}
+          />
+        </>
+      ),
+    },
+    {
+      header: "Token",
+      cellClassName: "token-cell",
+      cell: (coin) => (
+        <div className="token-info">
+          <Image
+            src={coin.image}
+            alt={coin.name}
+            width={36}
+            height={36}
+          />
+          <p>
+            { coin.name } ( {coin.symbol.toUpperCase()} )
+          </p>
+        </div>
+      ),
+    },
+    {
+      header: "Price",
+      cellClassName: "price-cell",
+      cell: (coin) => formatCurrency(coin.current_price),
+    },
+    {
+      header: "24h Change",
+      cellClassName: "change-cell",
+      cell: (coin) => {
+        const isTrendingUp = coin.price_change_percentage_24h > 0;
+
+        return (
+          <span
+            className={
+              cn("change-value", {
+              "text-green-600": isTrendingUp,
+              "text-red-500": !isTrendingUp,
+              })
+            }
+          >
+            { isTrendingUp && "+" }
+            { formatPercentage(coin.price_change_percentage_24h) }
+          </span>
+        );
+      },
+    },
+    {
+      header: "Market Cap",
+      cellClassName: "market-cap-cell",
+      cell: (coin) => formatCurrency(coin.market_cap),
+    },
+  ];
+
+  const hasMorePages = coinsData.length === perPage;
+  const estimatedTotalPages = hasMorePages ? currentPage + 1 : currentPage;
+  
+
+  return (
+    <main id="coins-page">
+      <div className="content">
+        <h4>All Coins</h4>
+
+        <DataTable
+          tableClassName="coins-table"
+          columns={columns}
+          data={coinsData}
+          rowKey={(coin) => coin.id}
+        />
+        <CoinsPagination
+          currentPage={currentPage}
+          totalPages={estimatedTotalPages}
+          hasMorePages={hasMorePages}
+        />
+      </div>
+    </main>
+  );
+};
